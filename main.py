@@ -1,3 +1,4 @@
+import csv
 import datetime
 import matplotlib.pyplot as plt
 
@@ -14,7 +15,7 @@ if __name__ == '__main__':
             date = row[:7]
             total = row[8:]
             monthTotalsDict[date] = total
-
+    file.close()
     monthAverages = {}
 
     def update_totals_by_month():
@@ -134,6 +135,7 @@ if __name__ == '__main__':
         plt.title('Date Vs. Checks')
         plt.xlabel('Date')
         plt.ylabel('Checks')
+        plt.savefig('line_graph.jpg')
 
     def averages_figure():
         plt.figure(2, facecolor='tan')
