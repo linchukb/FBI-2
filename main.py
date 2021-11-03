@@ -1,22 +1,26 @@
-import csv
 import datetime
 import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from scipy import stats
 
 if __name__ == '__main__':
 
-    monthTotalsDict = {}
+
+
+    month_totals_dict = {}
     totals_by_month_list = []
     months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
-    monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
+    month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
                   'November', 'December']
 
     with open('monthlyTotals.csv', newline='') as file:
         for row in file:
             date = row[:7]
             total = row[8:]
-            monthTotalsDict[date] = total
+            month_totals_dict[date] = total
     file.close()
-    monthAverages = {}
+    month_averages = {}
 
     def update_totals_by_month():
         global total_by_month_dict
@@ -26,26 +30,26 @@ if __name__ == '__main__':
             for row in file:
                 month = row[5:7]
                 value = row[8:]
-                thisTotal = total_by_month_dict[month]
-                thisTotal += int(value)
-                total_by_month_dict[month] = thisTotal
+                this_total = total_by_month_dict[month]
+                this_total += int(value)
+                total_by_month_dict[month] = this_total
 
-    def lookupRecord():
+    def lookup_record():
         print()
         print('LOOKUP RECORD')
         print('Enter a year-month to lookup in the format yyyy-mm')
         var = input('Enter a year-month: ')
         try:
-            record = monthTotalsDict[var]
+            record = month_totals_dict[var]
             print('Background Checks:' + record)
         except:
             print('Invalid Entry')
         print()
 
-    def addRecord():
+    def add_record():
         print()
         print('ADD RECORD')
-        last = max(monthTotalsDict.keys())
+        last = max(month_totals_dict.keys())
         if last[5:] == '12':
             next = str(int(last[:4]) + 1) + '-01'
         else:
@@ -54,36 +58,36 @@ if __name__ == '__main__':
         try:
             value = int(input('Value: '))
             value = str(value)
-            monthTotalsDict[next] = value
+            month_totals_dict[next] = value
         except:
             print()
             print('Invalid Entry')
 
-    def updateRecord():
+    def update_record():
         print()
         print('UPDATE RECORD')
         print('Select a record to update')
         key = input('Enter a year-month(yyyy-mm): ')
         try:
-            value = monthTotalsDict[key]
+            value = month_totals_dict[key]
             print('Old record:')
             print(key + ' : ' + value)
-            newValue = int(input('Enter new value: '))
-            newValue = str(newValue)
-            monthTotalsDict[key] = newValue
+            new_value = int(input('Enter new value: '))
+            new_value = str(new_value)
+            month_totals_dict[key] = new_value
             print('New Record: ')
-            print(key + ' : ' + monthTotalsDict[key])
+            print(key + ' : ' + month_totals_dict[key])
         except:
             print('Invalid Entry')
         print()
 
-    def deleteRecord():
+    def delete_record():
         print()
         print('DELETE RECORD')
         print('Select a record to update')
         key = input('Enter a year-month(yyyy-mm): ')
         try:
-            monthTotalsDict.pop(key)
+            month_totals_dict.pop(key)
             print('Deletion Successful')
         except:
             print('An error occurred')
@@ -103,11 +107,12 @@ if __name__ == '__main__':
             percentages.append(percentage)
             k += 1
 
-    def dashBoard():
+    def dashboard():
         print()
         print('Dashboard')
-        calculateMonthAverages()
+        calculate_month_averages()
         update_percentage_lists()
+
         # Pie Graph percentages
         # figure 1
         percentages_figure()
@@ -124,10 +129,10 @@ if __name__ == '__main__':
         plt.figure(3, facecolor='tan')
         Dates = []
         Checks = []
-        for date_i in list(monthTotalsDict.keys()):
+        for date_i in list(month_totals_dict.keys()):
             temp_date = datetime.date(int(date_i[:4]), int(date_i[5:]), 1)
             Dates.append(temp_date)
-        for check_i in list(monthTotalsDict.values()):
+        for check_i in list(month_totals_dict.values()):
             temp_check = int(check_i)
             Checks.append(temp_check)
         plt.xticks(rotation=45)
@@ -139,21 +144,22 @@ if __name__ == '__main__':
 
     def averages_figure():
         plt.figure(2, facecolor='tan')
-        plt.bar(range(len(monthAverages)), list(monthAverages.values()), align='center')
+        plt.bar(range(len(month_averages)), list(month_averages.values()), align='center')
         plt.title('Average Background Checks by Month')
         plt.xlabel('Month of Year (e.g., 01 = January)')
         plt.ylabel('Average Background Checks Submitted')
         plt.ticklabel_format(style='plain')
-        plt.xticks(range(len(monthAverages)), list(monthAverages.keys()))
+        plt.xticks(range(len(month_averages)), list(month_averages.keys()))
         plt.savefig('averages.jpg')
 
     def percentages_figure():
         plt.figure(1, facecolor='tan')
+        plt.title('Background Checks Percentages by Month')
         explode = [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05]
         centre_circle = plt.Circle((0, 0), 0.70, fc='tan')
         plt.gcf()
         plt.gca().add_artist(centre_circle)
-        plt.pie(percentages, labels=monthNames, autopct='%.2f%%', pctdistance=0.85, explode=explode)
+        plt.pie(percentages, labels=month_names, autopct='%.2f%%', pctdistance=0.85, explode=explode)
         plt.savefig('percentages.jpg')
 
     def records():
@@ -165,17 +171,17 @@ if __name__ == '__main__':
             print('3 - Update Record')
             print('4 - Delete Record')
             print('0 - Back')
-            userInput = int(input('Choose an option: '))
+            user_input = int(input('Choose an option: '))
             try:
-                if userInput == 1:
-                    lookupRecord()
-                elif userInput == 2:
-                    addRecord()
-                elif userInput == 3:
-                    updateRecord()
-                elif userInput == 4:
-                    deleteRecord()
-                elif userInput == 0:
+                if user_input == 1:
+                    lookup_record()
+                elif user_input == 2:
+                    add_record()
+                elif user_input == 3:
+                    update_record()
+                elif user_input == 4:
+                    delete_record()
+                elif user_input == 0:
                     return
                 else:
                     print()
@@ -183,23 +189,39 @@ if __name__ == '__main__':
             except:
                 print('Invalid Entry')
 
-    def calculateMonthAverages():
+    def calculate_month_averages():
         for month in months:
-            avgCount = 0
+            avg_count = 0
             total = 0
-            for key, value in monthTotalsDict.items():
-                recordMonth = key[5:]
-                if month == recordMonth:
-                    avgCount += 1
+            for key, value in month_totals_dict.items():
+                record_month = key[5:]
+                if month == record_month:
+                    avg_count += 1
                     total += int(value)
-            average = total / avgCount
-            monthAverages[month] = average
+            average = total / avg_count
+            month_averages[month] = average
 
-    def forecastingMenu():
+    def do_linear_regression():
+        x = np.array([i for i in range(len(month_totals_dict))]).reshape((-1, 1))
+        y = np.array(list(map(int, month_totals_dict.values())))
+
+        model = LinearRegression().fit(x, y)
+        return int(model.coef_)
+
+
+    # Calculating prediction...
+    # Predicted background checks next month(2020 - 04): 692511
+    # Coefficient of determination: 0.4238052430806428
+    # Intercept: 440923.72941176465
+    # Slope: [2733.22177117]
+
+
+
+    def do_forecast():
         print()
         print('Calculating prediction...')
-        calculateMonthAverages()
-        last = list(monthTotalsDict.keys())[-1]
+        calculate_month_averages()
+        last = list(month_totals_dict.keys())[-1]
 
         previous_month = last[5:]
         if int(previous_month) == 12:
@@ -210,14 +232,19 @@ if __name__ == '__main__':
             predict_month = months[int(previous_month)]
             predict_year_month = last[:5] + predict_month
 
-        average = monthAverages[predict_month]
-        trend = 0.0015651785
-        prediction = int(average + (average * trend))
+        average = month_averages[predict_month]
+        prediction = int(average + do_linear_regression())
         print('Predicted background checks next month(' + predict_year_month + '): ' + str(prediction))
 
-    def mainMenu():
+
+
+
+
+
+
+    def main_menu():
         while 1:
-            print("\nU.S. Firearm Company\n")
+            print("\nU.S. Firearms Company\n")
             print("MAIN MENU")
             print("1 - Dashboard")
             print("2 - Forecast next month")
@@ -228,9 +255,9 @@ if __name__ == '__main__':
                 print()
 
                 if userInput == 1:
-                    dashBoard()
+                    dashboard()
                 elif userInput == 2:
-                    forecastingMenu()
+                    do_forecast()
                 elif userInput == 3:
                     records()
                 elif userInput == 0:
@@ -240,4 +267,4 @@ if __name__ == '__main__':
             except:
                 print('Invalid Entry')
 
-    mainMenu()
+    main_menu()
